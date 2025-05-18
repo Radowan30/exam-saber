@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "438218517277",
+    "project_id": "exam-saber",
+    "storage_bucket": "exam-saber.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:438218517277:android:f7eeb2c94a83385b210ff4",
+        "android_client_info": {
+          "package_name": "com.example.exam_saber"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDekN_qP87dAG3wP_ID76iksB_lgXzULMQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
