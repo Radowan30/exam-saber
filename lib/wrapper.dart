@@ -23,12 +23,9 @@ class Wrapper extends StatelessWidget {
             } else {
               if (snapshot.data?.emailVerified == true) {
                 return const HomeScreen();
-              } else { // return const VerificationScreen();
-                return VerificationScreen(
-                  user: snapshot.data!,
-                );
+              } else {
+                return VerificationScreen(user: snapshot.data!);
               }
-              
             }
           }
         },
