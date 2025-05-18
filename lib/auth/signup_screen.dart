@@ -141,11 +141,6 @@ class _SignupScreenState extends State<SignupScreen> {
     MaterialPageRoute(builder: (context) => const LoginScreen()),
   );
 
-  goToHome(BuildContext context) => Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => const HomeScreen()),
-  );
-
   _signup() async {
     await _auth.createUserWithEmailAndPassword(_email.text, _password.text);
     Navigator.pop(context);
