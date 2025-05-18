@@ -28,13 +28,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      // Wrap the body in a SingleChildScrollView to handle keyboard overflow
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: Column(
             children: [
-              const SizedBox(height: 30), // Reduced from Spacer(flex: 1)
+              const SizedBox(height: 30),
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -99,7 +99,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   ),
                 ),
               ),
-              const SizedBox(height: 50), // Added space at bottom
+              const SizedBox(height: 50),
             ],
           ),
         ),

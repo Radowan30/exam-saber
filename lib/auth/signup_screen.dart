@@ -30,13 +30,12 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // Wrap the body in a SingleChildScrollView to handle keyboard overflow
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: Column(
             children: [
-              const SizedBox(height: 80), // Replaced Spacer with fixed height
+              const SizedBox(height: 80),
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -129,7 +128,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 80), // Added space at bottom
+              const SizedBox(height: 80),
             ],
           ),
         ),

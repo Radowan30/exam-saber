@@ -37,11 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/SABER-Logo.png', // Make sure to add this asset to your pubspec.yaml
-              height: 40,
-              width: 40,
-            ),
+            Image.asset('assets/SABER-Logo.png', height: 40, width: 40),
             const SizedBox(width: 8),
             const Text(
               "EXAM",
@@ -153,7 +149,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 16),
                     _buildContinueQuizCard(),
                     const SizedBox(height: 30),
-                    // Removed Sign Out Button from main page
                     const SizedBox(height: 20),
                   ],
                 ),
