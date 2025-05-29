@@ -15,8 +15,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _auth = AuthService();
 
-  final _email = TextEditingController();
-  final _password = TextEditingController();
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -98,27 +99,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: _login,
+                      child: const Text(
+                        "Login",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
-                  onPressed: _login,
-                  child: const Text(
-                    "Login",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -153,19 +156,38 @@ class _LoginScreenState extends State<LoginScreen> {
     MaterialPageRoute(builder: (context) => const SignupScreen()),
   );
 
-  _login() async {
-    final user = await _auth.loginUserWithEmailAndPassword(
-      _email.text,
-      _password.text,
+  void _login() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    String? result = await _auth.loginUserWithEmailAndPassword(
+      email: _email.text,
+      password: _password.text,
     );
 
-    if (user != null) {
-      // Navigate to home screen using wrapper to handle verification check
+    setState(() {
+      isLoading = false;
+    });
+
+    // Navigate based on the role or show error message
+    if (result == "Teacher") {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const Wrapper()),
+        MaterialPageRoute(builder: (context) => Wrapper(role: "Teacher")),
         (route) => false,
       );
+    } else if (result == "Student") {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Wrapper(role: "Student")),
+        (route) => false,
+      );
+    } else {
+      // Login failed - result contains error message
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Login Failed: $result")));
     }
   }
 }

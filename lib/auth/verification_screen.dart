@@ -9,8 +9,9 @@ import 'package:exam_saber/wrapper.dart';
 
 class VerificationScreen extends StatefulWidget {
   final User user;
+  final String? role;
 
-  const VerificationScreen({required this.user, super.key});
+  const VerificationScreen({this.role, required this.user, super.key});
 
   @override
   State<VerificationScreen> createState() => _VerificationScreenState();
@@ -29,7 +30,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
         timer.cancel();
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const Wrapper()),
+          MaterialPageRoute(builder: (context) => Wrapper(role: widget.role)),
         );
       }
     });

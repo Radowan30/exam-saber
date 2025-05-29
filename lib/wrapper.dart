@@ -1,11 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:exam_saber/auth/login_screen.dart';
 import 'package:exam_saber/auth/verification_screen.dart';
-import 'package:exam_saber/home_screen.dart';
+import 'package:exam_saber/teacher_screen.dart';
+import 'package:exam_saber/student_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Wrapper extends StatelessWidget {
-  const Wrapper({super.key});
+  final String? role;
+
+  const Wrapper({super.key, this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +26,45 @@ class Wrapper extends StatelessWidget {
               return const LoginScreen();
             } else {
               if (snapshot.data?.emailVerified == true) {
-                return const HomeScreen();
+                // If role is provided (from login), use it directly
+                if (role != null) {
+                  if (role == "Teacher") {
+                    return const TeacherScreen();
+                  } else {
+                    return const StudentScreen();
+                  }
+                } else {
+                  // If no role provided, fetch from Firestore
+                  return FutureBuilder<DocumentSnapshot>(
+                    future:
+                        FirebaseFirestore.instance
+                            .collection("users")
+                            .doc(snapshot.data!.uid)
+                            .get(),
+                    builder: (context, userSnapshot) {
+                      if (userSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (userSnapshot.hasError) {
+                        return const Center(
+                          child: Text("Error fetching user data"),
+                        );
+                      } else if (userSnapshot.hasData &&
+                          userSnapshot.data!.exists) {
+                        String userRole = userSnapshot.data!['role'];
+                        if (userRole == "Teacher") {
+                          return const TeacherScreen();
+                        } else {
+                          return const StudentScreen();
+                        }
+                      } else {
+                        return const Center(child: Text("User data not found"));
+                      }
+                    },
+                  );
+                }
               } else {
-                return VerificationScreen(user: snapshot.data!);
+                return VerificationScreen(user: snapshot.data!, role: role);
               }
             }
           }
