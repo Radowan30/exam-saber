@@ -88,24 +88,47 @@ class _SignupScreenState extends State<SignupScreen> {
                 controller: _password,
               ),
               const SizedBox(height: 20),
-              DropdownButtonFormField(
-                value: _role,
-                decoration: const InputDecoration(
-                  labelText: "Role",
-                  border: OutlineInputBorder(),
-                ),
-                items:
-                    ["Teacher", "Student"].map((role) {
-                      return DropdownMenuItem(value: role, child: Text(role));
-                    }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _role =
-                        newValue!; // Update the role based on user selection
-                  });
-                },
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Role",
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: DropdownButtonFormField(
+                      value: _role,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                      items:
+                          ["Teacher", "Student"].map((role) {
+                            return DropdownMenuItem(
+                              value: role,
+                              child: Text(role),
+                            );
+                          }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _role =
+                              newValue!; // Update the role based on user selection
+                        });
+                      },
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 50),
               // Signup Button or Loading Indicator
               isLoading
                   ? const Center(child: CircularProgressIndicator())
