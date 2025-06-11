@@ -649,6 +649,18 @@ class _TeacherScreenState extends State<TeacherScreen>
                                         fontSize: 18,
                                       ),
                                     ),
+                                    if (quizData['quizId'] != null)
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 4),
+                                        child: Text(
+                                          'Quiz ID: ${quizData['quizId']}',
+                                          style: const TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
                                     if (quizData['subject'] != null)
                                       Container(
                                         margin: const EdgeInsets.only(top: 8),
@@ -1083,6 +1095,16 @@ class _QuizDialogState extends State<QuizDialog> with TickerProviderStateMixin {
     'Foreign Language',
     'Philosophy',
   ];
+  String _generateShortQuizId([int length = 7]) {
+    const chars =
+        'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No similar-looking chars
+    final rand = math.Random.secure();
+    return List.generate(
+      length,
+      (index) => chars[rand.nextInt(chars.length)],
+    ).join();
+  }
+
   Widget _buildTimeButton(String label, int minutes) {
     return GestureDetector(
       onTap: () {
@@ -1216,10 +1238,11 @@ class _QuizDialogState extends State<QuizDialog> with TickerProviderStateMixin {
 
       try {
         if (_editingQuizId == null) {
+          final shortId = _generateShortQuizId();
           final docRef = await FirebaseFirestore.instance
               .collection('quizzes')
-              .add(quizData);
-          print('Quiz created with ID: ${docRef.id}');
+              .add({...quizData, 'quizId': shortId}); // Store shortId directly
+          print('Quiz created with ID: $shortId');
         } else {
           await FirebaseFirestore.instance
               .collection('quizzes')
@@ -1231,6 +1254,7 @@ class _QuizDialogState extends State<QuizDialog> with TickerProviderStateMixin {
                 'markscheme': _markschemeController.text.trim(),
                 'timeLimit': _selectedTimeMinutes, // Add this line
                 'updatedAt': FieldValue.serverTimestamp(),
+                'quizId': _editingQuizId,
               });
           print('Quiz updated with ID: $_editingQuizId');
         }
