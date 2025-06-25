@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:exam_saber/notes.dart';
+import 'package:exam_saber/ai_explanations.dart';
 
 class PastQuizzesScreen extends StatefulWidget {
   const PastQuizzesScreen({super.key});
@@ -462,11 +463,18 @@ class _PastQuizzesScreenState extends State<PastQuizzesScreen> {
                             ),
                             onPressed: () {
                               Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'AI Explanation feature coming soon!',
-                                  ),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => AIExplanationsScreen(
+                                        quizId: quizData['quizId'],
+                                        studentId:
+                                            FirebaseAuth
+                                                .instance
+                                                .currentUser!
+                                                .uid,
+                                      ),
                                 ),
                               );
                             },
