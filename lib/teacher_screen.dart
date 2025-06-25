@@ -5,6 +5,7 @@ import 'package:exam_saber/widgets/button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:exam_saber/teacher_marks_screen.dart';
 
 class TeacherScreen extends StatefulWidget {
   const TeacherScreen({super.key});
@@ -448,6 +449,7 @@ class _TeacherScreenState extends State<TeacherScreen>
         centerTitle: true,
       ),
       body: Stack(
+        
         children: [
           // Animated Background
           AnimatedBuilder(
@@ -511,6 +513,7 @@ class _TeacherScreenState extends State<TeacherScreen>
                   style: TextStyle(color: Colors.white),
                 ),
               )
+              
               : StreamBuilder<QuerySnapshot>(
                 stream:
                     FirebaseFirestore.instance
@@ -913,127 +916,158 @@ class _TeacherScreenState extends State<TeacherScreen>
   }
 
   Widget _buildDrawer(BuildContext context, AuthService auth) {
-    return Drawer(
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.grey[900]!, Colors.grey[850]!],
-          ),
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.red.withOpacity(0.8),
-                    Colors.orange.withOpacity(0.8),
-                  ],
-                ),
-              ),
-              child: Column(
-                children: [
-                  SizedBox(height: MediaQuery.of(context).padding.top),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/SABER-Logo.png',
-                        height: 50,
-                        width: 50,
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        "EXAM",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                        ),
-                      ),
-                      const Text(
-                        "SABER",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const Divider(color: Colors.white30),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  _buildDrawerItem(
-                    icon: Icons.history,
-                    title: "Past Quizzes",
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.lightbulb,
-                    title: "AI Explanations",
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.settings,
-                    title: "Settings",
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  const Divider(color: Colors.grey),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: CustomButton(
-                      label: "Sign Out",
-                      onPressed: () async {
-                        await auth.signout();
-                        if (mounted) {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (context) => const LoginScreen(),
-                            ),
-                            (route) => false,
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height:
-                        MediaQuery.of(context).padding.bottom > 0
-                            ? MediaQuery.of(context).padding.bottom
-                            : 16,
-                  ),
-                ],
-              ),
-            ),
-          ],
+  return Drawer(
+    child: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Colors.grey[900]!, Colors.grey[850]!],
         ),
       ),
-    );
-  }
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.red.withOpacity(0.8),
+                  Colors.orange.withOpacity(0.8),
+                ],
+              ),
+            ),
+            child: Column(
+              children: [
+                SizedBox(height: MediaQuery.of(context).padding.top),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/SABER-Logo.png',
+                      height: 50,
+                      width: 50,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      "EXAM",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                    const Text(
+                      "SABER",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const Divider(color: Colors.white30),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildDrawerItem(
+                  icon: Icons.history,
+                  title: "Past Quizzes",
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.lightbulb,
+                  title: "AI Explanations",
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.settings,
+                  title: "Settings",
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                // Add the View Student Marks button here
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context); // Close drawer first
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TeacherMarksScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.grade, color: Colors.white),
+                    label: const Text(
+                      "View Student Marks",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                const Divider(color: Colors.grey),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: CustomButton(
+                    label: "Sign Out",
+                    onPressed: () async {
+                      await auth.signout();
+                      if (mounted) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      }
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height:
+                      MediaQuery.of(context).padding.bottom > 0
+                          ? MediaQuery.of(context).padding.bottom
+                          : 16,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   Widget _buildDrawerItem({
     required IconData icon,

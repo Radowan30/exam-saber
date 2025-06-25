@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
+import 'package:firebase_ai/firebase_ai.dart';
+import 'dart:convert';
 
 class StudentAnswerScreen extends StatefulWidget {
   final Map<String, dynamic> quizData;
@@ -90,17 +92,93 @@ class _StudentAnswerScreenState extends State<StudentAnswerScreen> {
       final studentName =
           currentUser.displayName ?? currentUser.email ?? 'Unknown Student';
 
-      // Create the answer document
-      final answerData = {
+      var quizId = widget.quizData['quizId'];
+      var answer = _answerController.text.trim();
+
+      // Variables to hold the AI-generated score and explanations
+      Object scoreValue =
+          'Not Graded'; // Can be an int (total score) or a String
+      List<dynamic>? explanationsValue; // The list of explanations from the AI
+
+      // Start AI grading by first fetching the markscheme
+      CollectionReference quizzes = FirebaseFirestore.instance.collection(
+        'quizzes',
+      );
+      QuerySnapshot snapshot =
+          await quizzes.where('quizId', isEqualTo: quizId).limit(1).get();
+
+      if (snapshot.docs.isNotEmpty) {
+        var markScheme = snapshot.docs.first.get('markscheme');
+
+        // Making the jsonSchema for the AI response
+        final jsonSchema = Schema.object(
+          properties: {
+            'explanations': Schema.array(
+              items: Schema.object(
+                properties: {
+                  'question_number': Schema.integer(),
+                  'score': Schema.integer(),
+                  'explanation_with_suggestion': Schema.string(),
+                },
+              ),
+            ),
+          },
+        );
+
+        final model = FirebaseAI.googleAI().generativeModel(
+          model: 'gemini-2.5-flash',
+          generationConfig: GenerationConfig(
+            responseMimeType: 'application/json',
+            responseSchema: jsonSchema,
+          ),
+        );
+
+        final prompt =
+            '''Score the student answer based on the markscheme (both are given to you). For each answer scoring, provide an explanation on why the student received that score, and give a suggestion on how the student can improve. 
+          Answer: $answer, Markscheme: $markScheme''';
+
+        final response = await model.generateContent([Content.text(prompt)]);
+        // START : LOGIC FOR PROCESSING AI RESPONSE
+
+        if (response.text != null && response.text!.isNotEmpty) {
+          // 1. Decode the JSON string from the AI response.
+          final decodedResponse = jsonDecode(response.text!);
+
+          // 2. Extract the list of explanations.
+          final List<dynamic> explanationsList =
+              decodedResponse['explanations'];
+
+          // 3. Calculate the total score by summing up the 'score' from each item.
+          // We use fold for a safe and concise summation.
+          int totalScore = explanationsList.fold<int>(0, (sum, item) {
+            // Safely access 'score', defaulting to 0 if it's null or not an int.
+            final score = (item as Map<String, dynamic>)['score'];
+            return sum + (score as int? ?? 0);
+          });
+
+          // 4. Assign the calculated values to our variables.
+          scoreValue = totalScore;
+          explanationsValue = explanationsList;
+        } else {
+          // Handle cases where the AI might return an empty response
+          scoreValue = 'AI Error: No response';
+        }
+        // END: AI LOGIC
+      } else {
+        // If quiz or markscheme is not found, it cannot be graded.
+        print('Quiz with ID $quizId not found.');
+      }
+
+      // Create the answer document using the processed data
+      final Map<String, dynamic> answerData = {
         'studentId': currentUser.uid,
         'studentName': studentName,
-        'quizId': widget.quizData['quizId'],
+        'quizId': quizId,
         'teacherId': widget.quizData['userId'], // Teacher who created the quiz
         'quizTitle': widget.quizData['title'],
         'subject': widget.quizData['subject'],
-        'answer': _answerController.text.trim(),
-        'score':
-            1, // TODO: This will be replaced with AI scoring based on markscheme
+        'answer': answer,
+        'score': scoreValue, // Assign the calculated total_score here
         'submittedAt': FieldValue.serverTimestamp(),
         'isAutoSubmitted': isAutoSubmit,
         'timeSpent':
@@ -108,7 +186,12 @@ class _StudentAnswerScreenState extends State<StudentAnswerScreen> {
             _remainingTimeInSeconds, // Time spent in seconds
       };
 
-      // Submit to Firestore - this will create the 'answers' collection if it doesn't exist
+      // Conditionally add the 'explanations' field only if it exists
+      if (explanationsValue != null) {
+        answerData['explanations'] = explanationsValue;
+      }
+
+      // Submit to Firestore
       await FirebaseFirestore.instance.collection('answers').add(answerData);
 
       setState(() {
@@ -124,8 +207,8 @@ class _StudentAnswerScreenState extends State<StudentAnswerScreen> {
           SnackBar(
             content: Text(
               isAutoSubmit
-                  ? 'Quiz submitted automatically - Time\'s up!'
-                  : 'Quiz submitted successfully!',
+                  ? 'Quiz submitted automatically and scored.'
+                  : 'Quiz submitted successfully and scored.',
             ),
             backgroundColor: Colors.green,
           ),
